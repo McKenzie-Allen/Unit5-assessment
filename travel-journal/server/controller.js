@@ -1,6 +1,51 @@
+require('dotenv').config()
+const Sequelize = require('sequelize')
 
+const sequelize = new Sequelize(process.env.CONNECTION_STRING, {
+    dialect: 'postgres',
+    dialectOptions: {
+        ssl: {
+            rejectUnauthorized: false
+        }
+    }
+})
 
 module.exports = {
+    // getCities: (req, res) => {
+    //     sequelize.query(`select city_id, name as city, ratings from cities
+    //     join countries on cities.country_id = countries.country_id;`)
+    //         .then(dbRes => res.status(200).send(dbRes[0]))
+    //         .catch(err => console.log(err))
+    // },
+    getCities: (req, res) => {
+        sequelize.query(`select city_id, name as city, rating from cities
+        `)
+            .then(dbRes => res.status(200).send(dbRes[0]))
+            .catch(err => console.log(err))
+    },
+
+
+    createCity: (req, res) => {
+        let {
+            name,
+            rating,
+            countryId
+        } = req.body
+
+        sequelize.query(`insert into cities (name, rating, country_id)
+        values ('${name}', ${rating}, ${countryId})
+        `).then(dbRes => res.status(200).send(dbRes[0]))
+            .catch(err => console.log(err))
+
+    },
+
+
+    getCountries: (req, res) => {
+        sequelize.query(`
+        select * from countries
+        `).then(dbRes => res.status(200).send(dbRes[0]))
+            .catch(err => console.log(err))
+    },
     seed: (req, res) => {
         sequelize.query(`
             drop table if exists cities;
@@ -11,7 +56,12 @@ module.exports = {
                 name varchar
             );
 
-            *****YOUR CODE HERE*****
+            create table cities (
+                city_id serial primary key,
+                name varchar,
+                rating integer,
+                country_id integer references countries(country_id)
+            );
 
             insert into countries (name)
             values ('Afghanistan'),
