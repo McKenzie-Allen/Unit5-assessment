@@ -17,12 +17,7 @@ module.exports = {
     //         .then(dbRes => res.status(200).send(dbRes[0]))
     //         .catch(err => console.log(err))
     // },
-    getCities: (req, res) => {
-        sequelize.query(`select city_id, name as city, rating from cities
-        `)
-            .then(dbRes => res.status(200).send(dbRes[0]))
-            .catch(err => console.log(err))
-    },
+
 
 
     createCity: (req, res) => {
@@ -46,6 +41,26 @@ module.exports = {
         `).then(dbRes => res.status(200).send(dbRes[0]))
             .catch(err => console.log(err))
     },
+
+    getCities: (req, res) => {
+        sequelize.query(`select cities.city_id, cities.name as city, cities.rating, countries.country_id, countries.name as country from cities
+        join countries on cities.country_id = countries.country_id
+        `)
+            .then(dbRes => res.status(200).send(dbRes[0]))
+            .catch(err => console.log(err))
+    },
+
+    deleteCity: (req, res) => {
+        let {
+            id
+        } = req.params
+
+        console.log
+        sequelize.query(`delete from cities where city_id = ${id}
+        `).then(dbRes => res.status(200).send(dbRes[0]))
+            .catch(err => console.log(err))
+    },
+
     seed: (req, res) => {
         sequelize.query(`
             drop table if exists cities;
